@@ -1,0 +1,42 @@
+name: Build WindowTransparency for macOS Sierra
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-13
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Compilar aplicación
+        run: |
+          set -e
+
+          rm -rf WindowTransparency.app
+          mkdir -p WindowTransparency.app/Contents/MacOS
+
+          clang -fobjc-arc \
+            -framework Cocoa \
+            -framework ApplicationServices \
+            -mmacosx-version-min=10.12 \
+            Sources/main.m \
+            -o WindowTransparency.app/Contents/MacOS/WindowTransparency
+
+          cp Info.plist WindowTransparency.app/Contents/Info.plist
+
+          codesign --force --deep --sign - WindowTransparency.app
+
+      - name: Crear ZIP
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            WindowTransparency.app \
+            WindowTransparency-macOS-Sierra.zip
+
+      - name: Entregar aplicación
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowTransparency-macOS-Sierra
+          path: WindowTransparency-macOS-Sierra.zip
