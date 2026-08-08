@@ -7,7 +7,7 @@ jobs:
   build:
     # The exact macOS 10.12 runner is no longer provided by GitHub.
     # We compile with a modern runner while explicitly targeting 10.12.
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - name: Checkout
